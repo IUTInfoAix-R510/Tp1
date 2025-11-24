@@ -2020,9 +2020,428 @@ db.livres.find({"auteur.nom": "Orwell"})
 
 ### 4.3 Exercices de modification sur documents complexes (20 min)
 
+Vous savez maintenant interroger des documents imbriqués. Apprenons à les **modifier** ! Cette section est cruciale pour comprendre comment mettre à jour des données dans des tableaux et objets imbriqués.
+
+#### Exercice 32 : Modifier un champ imbriqué simple
+**Objectif :** Corriger la nationalité de George Orwell : elle doit être "Anglaise" au lieu de "Britannique"
+
+**Ce que vous devez pratiquer :** Utiliser `$set` avec notation pointée sur un objet imbriqué
+
+<details>
+<summary>💡 Solution</summary>
+
 ```javascript
-// 1. Livres disponibles
-db.livres.find(
+db.livres.updateOne(
+    {titre: "1984"},
+    {$set: {"auteur.nationalite": "Anglaise"}}
+)
+
+// Vérifier le changement
+db.livres.findOne(
+    {titre: "1984"},
+    {titre: 1, auteur: 1, _id: 0}
+)
+```
+
+**Explications :**
+- `$set` fonctionne aussi avec la notation pointée
+- `"auteur.nationalite"` : guillemets obligatoires
+- Seul le champ `nationalite` est modifié, les autres champs de `auteur` restent intacts
+- Équivalent SQL : `UPDATE livres SET auteur_nationalite = 'Anglaise' WHERE titre = '1984'`
+</details>
+
+---
+
+#### Exercice 33 : Ajouter un champ imbriqué
+**Objectif :** Ajouter le site web officiel de J.K. Rowling dans le document Harry Potter
+
+**Ce que vous devez pratiquer :** Ajouter un nouveau champ dans un objet imbriqué avec `$set`
+
+<details>
+<summary>💡 Solution</summary>
+
+```javascript
+db.livres.updateOne(
+    {titre: "Harry Potter à l'école des sorciers"},
+    {$set: {"auteur.site_web": "https://www.jkrowling.com"}}
+)
+
+// Vérifier
+db.livres.findOne(
+    {titre: "Harry Potter à l'école des sorciers"},
+    {titre: 1, auteur: 1}
+)
+```
+
+**Explications :**
+- `$set` crée le champ `site_web` dans l'objet `auteur` s'il n'existe pas
+- La structure reste cohérente : le site web est logiquement dans l'auteur
+- Schéma flexible de MongoDB : on peut ajouter des champs à tout moment
+</details>
+
+---
+
+#### Exercice 34 : Modifier un élément spécifique dans un tableau (opérateur positionnel $)
+**Objectif :** L'exemplaire "LPP-001" du Petit Prince vient d'être abîmé. Changer son état de "Bon" à "Usé"
+
+**Ce que vous devez pratiquer :** Utiliser l'opérateur positionnel `$` pour modifier un élément précis dans un tableau
+
+<details>
+<summary>💡 Solution</summary>
+
+```javascript
+db.livres.updateOne(
+    {
+        isbn: "978-2-07-036822-8",
+        "exemplaires.code": "LPP-001"  // Critère : quel exemplaire ?
+    },
+    {
+        $set: {"exemplaires.$.etat": "Usé"}  // $ = l'exemplaire qui match
+    }
+)
+
+// Vérifier
+db.livres.findOne(
+    {isbn: "978-2-07-036822-8"},
+    {titre: 1, exemplaires: 1}
+)
+```
+
+**Explications :**
+- `"exemplaires.code": "LPP-001"` dans le critère : identifie QUEL élément du tableau modifier
+- `"exemplaires.$.etat"` : le `$` représente **l'élément du tableau qui a matché** le critère
+- Sans `$`, MongoDB ne saurait pas quel exemplaire modifier
+- ⚠️ Limitation : `$` ne modifie que le **premier** élément qui match
+
+**Équivalent SQL :**
+```sql
+UPDATE exemplaires
+SET etat = 'Usé'
+WHERE livre_isbn = '978-2-07-036822-8' AND code = 'LPP-001'
+```
+</details>
+
+---
+
+#### Exercice 35 : Modifier un champ imbriqué à 3 niveaux
+**Objectif :** Marie Dupont (M001) prolonge son emprunt du Petit Prince de 7 jours. Modifier la date de retour prévue
+
+**Ce que vous devez pratiquer :** Opérateur `$` à 3 niveaux d'imbrication
+
+<details>
+<summary>💡 Solution</summary>
+
+```javascript
+// 1. D'abord, voir la date actuelle
+db.livres.findOne(
+    {"exemplaires.emprunt_actuel.membre_id": "M001"},
+    {titre: 1, "exemplaires.$": 1}
+)
+
+// 2. Modifier la date (calculer nouvelle date)
+let nouvelle_date = new Date("2024-01-31")  // 7 jours après la date initiale
+
+db.livres.updateOne(
+    {
+        isbn: "978-2-07-036822-8",
+        "exemplaires.emprunt_actuel.membre_id": "M001"
+    },
+    {
+        $set: {
+            "exemplaires.$.emprunt_actuel.date_retour_prevue": nouvelle_date
+        }
+    }
+)
+
+// 3. Vérifier
+db.livres.findOne(
+    {"exemplaires.emprunt_actuel.membre_id": "M001"},
+    {titre: 1, "exemplaires.$": 1}
+)
+```
+
+**Explications :**
+- `"exemplaires.$.emprunt_actuel.date_retour_prevue"` : notation pointée à 3 niveaux avec `$`
+- `$` représente l'exemplaire dont `emprunt_actuel.membre_id` vaut "M001"
+- On modifie un champ profondément imbriqué dans le tableau
+</details>
+
+---
+
+#### Exercice 36 : Ajouter un élément dans un tableau imbriqué (nouveau livre)
+**Objectif :** La médiathèque achète un nouvel exemplaire du Petit Prince : code "LPP-004", état "Neuf", disponible, emplacement "Rayon A3"
+
+**Ce que vous devez pratiquer :** Utiliser `$push` pour ajouter un objet dans un tableau
+
+<details>
+<summary>💡 Solution</summary>
+
+```javascript
+db.livres.updateOne(
+    {isbn: "978-2-07-036822-8"},
+    {
+        $push: {
+            exemplaires: {
+                code: "LPP-004",
+                etat: "Neuf",
+                disponible: true,
+                emplacement: "Rayon A3"
+            }
+        }
+    }
+)
+
+// Vérifier
+db.livres.findOne(
+    {isbn: "978-2-07-036822-8"},
+    {titre: 1, exemplaires: 1}
+)
+```
+
+**Explications :**
+- `$push` ajoute un nouvel objet complet à la fin du tableau `exemplaires`
+- On peut ajouter un objet complexe avec plusieurs champs
+- Le livre passe de 3 à 4 exemplaires
+- Pas besoin d'opérateur `$` ici car on ajoute, on ne modifie pas un élément existant
+</details>
+
+---
+
+#### Exercice 37 : Retirer un élément d'un tableau imbriqué
+**Objectif :** L'exemplaire "1984-002" est perdu. Le retirer complètement de la base
+
+**Ce que vous devez pratiquer :** Utiliser `$pull` pour supprimer un élément d'un tableau
+
+<details>
+<summary>💡 Solution</summary>
+
+```javascript
+db.livres.updateOne(
+    {isbn: "978-2-253-00334-0"},
+    {
+        $pull: {
+            exemplaires: {code: "1984-002"}
+        }
+    }
+)
+
+// Vérifier
+db.livres.findOne(
+    {isbn: "978-2-253-00334-0"},
+    {titre: 1, exemplaires: 1}
+)
+```
+
+**Explications :**
+- `$pull` retire **tous les éléments** du tableau qui correspondent au critère
+- `{code: "1984-002"}` : retire l'élément où `code` vaut "1984-002"
+- Le livre "1984" passe de 2 à 1 exemplaire
+- Alternative : `$pull` avec critères complexes : `{$pull: {exemplaires: {etat: "Usé", disponible: false}}}`
+</details>
+
+---
+
+#### Exercice 38 : Incrémenter un compteur lors d'un emprunt
+**Objectif :** Quand Harry Potter est emprunté, augmenter le compteur `nombre_emprunts_total` de 1
+
+**Ce que vous devez pratiquer :** Combiner `$inc` pour gérer des statistiques
+
+<details>
+<summary>💡 Solution</summary>
+
+```javascript
+db.livres.updateOne(
+    {isbn: "978-2-07-041999-0"},
+    {$inc: {nombre_emprunts_total: 1}}
+)
+
+// Vérifier
+db.livres.findOne(
+    {isbn: "978-2-07-041999-0"},
+    {titre: 1, nombre_emprunts_total: 1}
+)
+```
+
+**Explications :**
+- `$inc: {nombre_emprunts_total: 1}` : incrémente de 1 (atomique et thread-safe)
+- Utile pour les statistiques : pas besoin de lire puis réécrire
+- En production, cette opération serait combinée avec la mise à jour de l'exemplaire
+</details>
+
+---
+
+#### Exercice 39 : Opération complexe - Simuler un emprunt complet
+**Objectif :** Le membre "M003" emprunte l'exemplaire "HP1-003" de Harry Potter aujourd'hui, retour dans 14 jours
+
+**Ce que vous devez pratiquer :** Combiner plusieurs opérateurs (`$set`, `$inc`, `$unset`, `$`)
+
+<details>
+<summary>💡 Solution</summary>
+
+```javascript
+// Dates de l'emprunt
+let date_emprunt = new Date()
+let date_retour = new Date()
+date_retour.setDate(date_retour.getDate() + 14)  // +14 jours
+
+// Mise à jour du livre
+db.livres.updateOne(
+    {
+        isbn: "978-2-07-041999-0",
+        "exemplaires.code": "HP1-003"
+    },
+    {
+        $set: {
+            "exemplaires.$.disponible": false,
+            "exemplaires.$.emprunt_actuel": {
+                membre_id: "M003",
+                date_emprunt: date_emprunt,
+                date_retour_prevue: date_retour
+            }
+        },
+        $unset: {
+            "exemplaires.$.emplacement": ""  // L'exemplaire n'est plus au rayon
+        },
+        $inc: {nombre_emprunts_total: 1}
+    }
+)
+
+// Vérifier
+db.livres.findOne(
+    {isbn: "978-2-07-041999-0"},
+    {titre: 1, exemplaires: 1, nombre_emprunts_total: 1}
+)
+```
+
+**Explications :**
+- Opération **atomique** qui fait 3 choses en une seule commande :
+  1. `$set` : marque comme indisponible et ajoute les infos d'emprunt
+  2. `$unset` : retire le champ `emplacement` (plus pertinent quand emprunté)
+  3. `$inc` : incrémente le compteur global
+- Tous les changements réussissent ou échouent ensemble (atomicité)
+- En production, on mettrait aussi à jour le document du membre avec `$push`
+</details>
+
+---
+
+#### Exercice 40 : Opération complexe - Simuler un retour de livre
+**Objectif :** Le membre "M001" retourne l'exemplaire "LPP-002" du Petit Prince
+
+**Ce que vous devez pratiquer :** Remettre l'exemplaire à disposition
+
+<details>
+<summary>💡 Solution</summary>
+
+```javascript
+db.livres.updateOne(
+    {
+        isbn: "978-2-07-036822-8",
+        "exemplaires.code": "LPP-002"
+    },
+    {
+        $set: {
+            "exemplaires.$.disponible": true,
+            "exemplaires.$.emplacement": "À ranger"
+        },
+        $unset: {
+            "exemplaires.$.emprunt_actuel": ""  // Supprimer l'objet emprunt
+        }
+    }
+)
+
+// Vérifier
+db.livres.findOne(
+    {isbn: "978-2-07-036822-8"},
+    {titre: 1, "exemplaires.$": 1}
+)
+```
+
+**Explications :**
+- `$set` : remet `disponible` à `true` et ajoute un emplacement temporaire
+- `$unset` : supprime complètement l'objet `emprunt_actuel` (plus nécessaire)
+- L'exemplaire redevient empruntable
+- En production, on retirerait aussi l'emprunt de la liste du membre
+</details>
+
+---
+
+#### 🎯 Exercice bonus : Mettre à jour plusieurs exemplaires d'un coup
+**Objectif :** Tous les exemplaires "Usés" du Petit Prince doivent passer en réparation. Ajouter le champ `en_reparation: true` à tous
+
+**Ce que vous devez pratiquer :** Mise à jour multiple dans un tableau avec `$[]` (tous les éléments)
+
+<details>
+<summary>💡 Solution</summary>
+
+```javascript
+// ⚠️ Cette syntaxe est avancée (MongoDB 3.6+)
+db.livres.updateOne(
+    {isbn: "978-2-07-036822-8"},
+    {
+        $set: {
+            "exemplaires.$[elem].en_reparation": true
+        }
+    },
+    {
+        arrayFilters: [{"elem.etat": "Usé"}]  // Filtrer sur état = Usé
+    }
+)
+
+// Vérifier
+db.livres.findOne(
+    {isbn: "978-2-07-036822-8"},
+    {titre: 1, exemplaires: 1}
+)
+```
+
+**Explications :**
+- `$[elem]` : représente chaque élément du tableau (pas seulement le premier)
+- `arrayFilters` : définit quel critère appliquer à `elem`
+- Tous les exemplaires avec `etat: "Usé"` sont modifiés en une seule requête
+- Plus efficace que boucler avec `$` (qui ne modifie que le premier)
+
+**Alternative simple (si vous ne connaissez pas encore `arrayFilters`) :**
+```javascript
+// Méthode 1 : Modifier chaque exemplaire individuellement avec $
+db.livres.updateOne(
+    {isbn: "978-2-07-036822-8", "exemplaires.etat": "Usé"},
+    {$set: {"exemplaires.$.en_reparation": true}}
+)
+// Répéter pour chaque exemplaire usé...
+```
+</details>
+
+---
+
+#### ✅ Auto-évaluation
+
+Avant de passer à l'agrégation, vérifiez que vous maîtrisez :
+- [ ] Modifier un champ imbriqué avec `$set` et notation pointée
+- [ ] Utiliser l'opérateur positionnel `$` pour modifier un élément d'un tableau
+- [ ] Ajouter un élément dans un tableau avec `$push`
+- [ ] Retirer un élément d'un tableau avec `$pull`
+- [ ] Supprimer un champ imbriqué avec `$unset`
+- [ ] Combiner plusieurs opérateurs (`$set`, `$inc`, `$unset`) dans une seule mise à jour
+- [ ] Comprendre l'opérateur `$[]` pour modifier plusieurs éléments (bonus)
+
+⚠️ **Erreurs courantes :**
+```javascript
+// ❌ FAUX - Oubli du $ dans la mise à jour
+db.livres.updateOne(
+    {"exemplaires.code": "LPP-001"},
+    {$set: {"exemplaires.etat": "Usé"}}  // Modifiera TOUS les exemplaires !
+)
+
+// ✅ CORRECT - Avec $ pour cibler l'élément spécifique
+db.livres.updateOne(
+    {"exemplaires.code": "LPP-001"},
+    {$set: {"exemplaires.$.etat": "Usé"}}
+)
+```
+
+---
+
+### 4.4 Introduction à l'agrégation avec exercices (15 min)
     {"exemplaires.disponible": true},
     {titre: 1, "exemplaires.$": 1}
 )
