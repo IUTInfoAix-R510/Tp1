@@ -21,8 +21,8 @@
 - **Modéliser** des données en mode document (embedding vs références)
 - **Réaliser** un cas pratique complet de gestion de médiathèque
 
-### Lien avec le projet SteamCity
-Cette séance pose les fondations pour votre projet fil rouge **SteamCity.io**, une plateforme IoT de monitoring urbain. Les concepts d'aujourd'hui (documents flexibles, tableaux embarqués, timestamps) seront essentiels pour stocker les données de capteurs que vous manipulerez dans les prochaines séances.
+### Lien avec le projet final
+Cette séance pose les fondations pour votre projet fil rouge, une plateforme IoT de monitoring urbain. Les concepts d'aujourd'hui (documents flexibles, tableaux embarqués, timestamps) seront essentiels pour stocker les données de capteurs que vous manipulerez dans les prochaines séances.
 
 ### Prérequis
 - Maîtrise du SQL (SELECT, JOIN, normalisation)
@@ -851,9 +851,9 @@ db.dropDatabase()
 
 ---
 
-## 🔨 Phase 3 : Premières manipulations MongoDB
+## 🔨 Phase 3 : Premières manipulations MongoDB (45 min)
 
-### 3.1 Concepts fondamentaux
+### 3.1 Concepts fondamentaux (5 min)
 
 #### Hiérarchie des objets
 ```javascript
@@ -895,7 +895,7 @@ show collections
 db.stats()
 ```
 
-### 3.2 Insertion progressive de documents
+### 3.2 Insertion progressive de documents (10 min)
 
 ```javascript
 // 1. Document minimal
@@ -981,7 +981,7 @@ db.personnes.insertOne({
 ```
 </details>
 
-### 3.3 Requêtes basiques
+### 3.3 Requêtes basiques (5 min)
 
 ```javascript
 // Base de travail plus riche
@@ -1035,7 +1035,7 @@ db.employes.find({competences: "MongoDB"})
 
 ---
 
-### 3.4 Exercices d'interrogation de données (20 min)
+### 3.4 Exercices d'interrogation de données (10 min)
 
 Maintenant que vous avez vu les différentes syntaxes, testez votre compréhension avec ces exercices pratiques sur la collection `employes`.
 
@@ -1290,7 +1290,7 @@ Avant de passer à la suite, vérifiez que vous maîtrisez :
 
 ---
 
-### 3.5 Exercices de modification de données (20 min)
+### 3.5 Exercices de modification de données (10 min)
 
 Maintenant que vous savez interroger les données, apprenons à les modifier ! Utilisez toujours la collection `employes` pour ces exercices.
 
@@ -1589,7 +1589,7 @@ Avant de passer à la suite, vérifiez que vous maîtrisez :
 
 ---
 
-### 3.6 Exercices de suppression de données (15 min)
+### 3.6 Exercices de suppression de données (5 min)
 
 Dernière opération CRUD : la suppression ! Attention, ces opérations sont **irréversibles** en production.
 
@@ -1833,13 +1833,93 @@ Avant de passer à la suite, vérifiez que vous maîtrisez :
 
 ---
 
+### ✅ Point de validation #2
+
+**Avant de passer à la Phase 4, vérifiez que vous maîtrisez :**
+
+**Opérations CRUD de base**
+- [ ] Créer une base et une collection (`use`, `insertOne`, `insertMany`)
+- [ ] Insérer des documents avec différentes structures
+- [ ] Interroger des documents avec `find()`, `findOne()`
+- [ ] Utiliser les opérateurs de comparaison (`$gt`, `$lt`, `$in`, etc.)
+- [ ] Utiliser les opérateurs logiques (`$and`, `$or`, `$not`)
+- [ ] Modifier des documents avec `updateOne()`, `updateMany()`
+- [ ] Utiliser les opérateurs de mise à jour (`$set`, `$inc`, `$push`, etc.)
+- [ ] Supprimer des documents avec `deleteOne()`, `deleteMany()`
+
+**Tests de validation**
+
+Essayez ces commandes pour vérifier votre compréhension :
+
+```javascript
+// 1. Créer une collection test
+use validation_test
+db.test_validation.drop()
+
+// 2. Insérer des documents variés
+db.test_validation.insertMany([
+    {nom: "Produit A", prix: 100, stock: 50, categorie: "Électronique"},
+    {nom: "Produit B", prix: 200, stock: 30, categorie: "Informatique"},
+    {nom: "Produit C", prix: 150, stock: 0, categorie: "Électronique"}
+])
+
+// 3. Requête avec opérateur
+db.test_validation.find({prix: {$gte: 150}})
+// ✅ Doit retourner Produit B et C
+
+// 4. Mise à jour
+db.test_validation.updateOne(
+    {nom: "Produit C"},
+    {$inc: {stock: 10}}
+)
+// ✅ Doit incrémenter le stock de 10
+
+// 5. Vérification
+db.test_validation.findOne({nom: "Produit C"})
+// ✅ stock doit être 10
+
+// 6. Suppression conditionnelle
+db.test_validation.deleteMany({categorie: "Informatique"})
+// ✅ Doit supprimer Produit B
+
+// 7. Comptage final
+db.test_validation.countDocuments()
+// ✅ Doit afficher 2
+
+// 8. Nettoyage
+db.test_validation.drop()
+```
+
+**Si tous les tests passent** → Vous êtes prêt pour la Phase 4 ! 🎉
+
+**Si un test échoue** → Relire les sections 3.4, 3.5, 3.6 ou refaire les exercices
+
+---
+
+### 📊 Récapitulatif de la Phase 3
+
+**Ce que vous avez appris :**
+1. Les 4 opérations CRUD : Create (insert), Read (find), Update (update), Delete (delete)
+2. Structure hiérarchique : Serveur → Base → Collection → Document
+3. Documents MongoDB = objets JSON avec `_id` automatique
+4. Opérateurs de requête pour filtrer les données (`$gt`, `$lt`, `$in`, `$regex`)
+5. Opérateurs de modification pour transformer les données (`$set`, `$inc`, `$push`, `$pull`)
+6. Différence entre opérations "One" (un seul document) et "Many" (plusieurs)
+7. Importance de tester avec `find()` avant `update()` ou `delete()`
+
+**Temps passé :** ~45 minutes
+**Exercices réalisés :** 23 exercices progressifs sur la collection `employes`
+**Prochaine étape :** Phase 4 - Modélisation avancée et documents imbriqués
+
+---
+
 ## 🎯 Phase 4 : CRUD complet sur cas concret (60 min)
 
 Cette phase vous permet de mettre en pratique **tous les concepts vus précédemment** sur un cas réel : une médiathèque. Vous allez découvrir comment modéliser des données complexes avec des **documents imbriqués** et des **tableaux**, puis réaliser des opérations avancées.
 
 ---
 
-### 4.1 Contexte et modélisation guidée (15 min)
+### 4.1 Contexte et modélisation guidée (10 min)
 
 #### 📖 Le contexte métier
 
@@ -2212,7 +2292,7 @@ Vérifiez votre compréhension avant de continuer :
 
 ---
 
-### 4.2 Exercices d'interrogation sur documents imbriqués (20 min)
+### 4.2 Exercices d'interrogation sur documents imbriqués (15 min)
 
 Maintenant que vous avez des données complexes, apprenons à les interroger efficacement ! Ces exercices vous apprennent la **notation pointée**, essentielle pour travailler avec des documents imbriqués.
 
