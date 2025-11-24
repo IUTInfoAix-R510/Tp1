@@ -2442,51 +2442,151 @@ db.livres.updateOne(
 ---
 
 ### 4.4 Introduction à l'agrégation avec exercices (15 min)
-    {"exemplaires.disponible": true},
-    {titre: 1, "exemplaires.$": 1}
-)
 
-// 2. Livres d'une catégorie
-db.livres.find(
-    {categories: "Science-Fiction"},
-    {titre: 1, auteur: 1, note_moyenne: 1}
-).sort({note_moyenne: -1})
+L'**agrégation** est un outil puissant pour faire des **statistiques** et des **transformations** complexes sur vos données. C'est l'équivalent MongoDB des `GROUP BY`, `JOIN` et fonctions d'agrégation SQL.
 
-// 3. Recherche textuelle (sur mots-clés)
-db.livres.createIndex({mots_cles: 1})
-db.livres.find({mots_cles: {$in: ["magie", "sorcier"]}})
+#### 📊 Concept : Le pipeline d'agrégation
 
-// 4. Exemplaires empruntés avec retard
-let aujourd_hui = new Date()
-db.livres.find({
-    "exemplaires.emprunt_actuel.date_retour_prevue": {$lt: aujourd_hui}
-})
+L'agrégation fonctionne comme un **pipeline** (tuyau) où les données passent par plusieurs **étapes** successives :
 
-// 5. Top 5 des livres les plus empruntés
-db.livres.find(
-    {},
-    {titre: 1, nombre_emprunts_total: 1}  // Projection : sélection des champs
-)
-    .sort({nombre_emprunts_total: -1})
-    .limit(5)
+```javascript
+db.collection.aggregate([
+    {$match: {...}},      // Étape 1 : Filtrer (WHERE en SQL)
+    {$project: {...}},    // Étape 2 : Sélectionner des champs (SELECT en SQL)
+    {$group: {...}},      // Étape 3 : Grouper (GROUP BY en SQL)
+    {$sort: {...}},       // Étape 4 : Trier (ORDER BY en SQL)
+    {$limit: 5}           // Étape 5 : Limiter (LIMIT en SQL)
+])
+```
 
-// 6. Membres avec emprunts en cours
-db.membres.find({
-    "emprunts_en_cours": {$exists: true, $ne: []}
-})
+**Analogie :** Imaginez une chaîne de production :
+1. Les documents entrent dans le pipeline
+2. Chaque étape transforme les données
+3. Le résultat final sort à la fin
 
-// 7. Statistiques par catégorie (agrégation simple)
+#### Exercice 41 : Compter le nombre de livres par catégorie
+**Objectif :** Afficher combien de livres existent dans chaque catégorie
+
+**Ce que vous devez pratiquer :** `$unwind` pour "dérouler" un tableau + `$group` pour compter
+
+<details>
+<summary>💡 Solution</summary>
+
+```javascript
+db.livres.aggregate([
+    {$unwind: "$categories"},  // Étape 1 : Dérouler le tableau categories
+    {$group: {                  // Étape 2 : Grouper par catégorie
+        _id: "$categories",
+        nombre_livres: {$sum: 1}
+    }},
+    {$sort: {nombre_livres: -1}}  // Étape 3 : Trier par popularité
+])
+```
+
+**Explications :**
+- `$unwind: "$categories"` : chaque livre avec N catégories devient N documents séparés
+  - Avant : `{titre: "HP", categories: ["Fantasy", "Jeunesse"]}`
+  - Après : 2 documents → `{titre: "HP", categories: "Fantasy"}` et `{titre: "HP", categories: "Jeunesse"}`
+- `$group` : regroupe par valeur de `categories` et compte avec `{$sum: 1}`
+- `_id` dans `$group` : c'est le champ de regroupement (comme GROUP BY en SQL)
+- `$` devant les champs : indique qu'on référence une valeur de document
+
+**Résultat attendu :**
+```javascript
+[
+  { _id: "Fantasy", nombre_livres: 1 },
+  { _id: "Jeunesse", nombre_livres: 2 },
+  { _id: "Science-Fiction", nombre_livres: 1 },
+  ...
+]
+```
+</details>
+
+---
+
+#### Exercice 42 : Calculer la note moyenne par catégorie
+**Objectif :** Pour chaque catégorie, afficher la note moyenne des livres
+
+**Ce que vous devez pratiquer :** `$group` avec `$avg` (moyenne)
+
+<details>
+<summary>💡 Solution</summary>
+
+```javascript
 db.livres.aggregate([
     {$unwind: "$categories"},
     {$group: {
         _id: "$categories",
-        nombre_livres: {$sum: 1},
-        note_moyenne: {$avg: "$note_moyenne"}
+        note_moyenne: {$avg: "$note_moyenne"},
+        nombre_livres: {$sum: 1}
     }},
-    {$sort: {nombre_livres: -1}}
+    {$sort: {note_moyenne: -1}}
 ])
+```
 
-// 8. Disponibilité par titre
+**Explications :**
+- `$avg: "$note_moyenne"` : calcule la moyenne du champ `note_moyenne` pour chaque groupe
+- On peut combiner plusieurs accumulateurs : `$sum`, `$avg`, `$min`, `$max`, etc.
+- Équivalent SQL : `SELECT categories, AVG(note_moyenne), COUNT(*) FROM livres GROUP BY categories`
+
+**Résultat attendu :**
+```javascript
+[
+  { _id: "Fantasy", note_moyenne: 4.9, nombre_livres: 1 },
+  { _id: "Jeunesse", note_moyenne: 4.85, nombre_livres: 2 },
+  ...
+]
+```
+</details>
+
+---
+
+#### Exercice 43 : Compter le nombre total d'exemplaires par livre
+**Objectif :** Afficher chaque livre avec son nombre total d'exemplaires
+
+**Ce que vous devez pratiquer :** `$project` avec `$size` pour compter les éléments d'un tableau
+
+<details>
+<summary>💡 Solution</summary>
+
+```javascript
+db.livres.aggregate([
+    {$project: {
+        titre: 1,
+        auteur: 1,
+        nombre_exemplaires: {$size: "$exemplaires"}
+    }},
+    {$sort: {nombre_exemplaires: -1}}
+])
+```
+
+**Explications :**
+- `$project` : définit les champs à afficher dans le résultat
+- `$size: "$exemplaires"` : compte le nombre d'éléments dans le tableau
+- `titre: 1` : inclure le titre (comme dans les projections classiques)
+- Pas besoin de `$unwind` ici : on veut juste compter, pas traiter chaque élément
+
+**Résultat attendu :**
+```javascript
+[
+  { titre: "Harry Potter à l'école des sorciers", nombre_exemplaires: 4 },
+  { titre: "Le Petit Prince", nombre_exemplaires: 3 },
+  { titre: "1984", nombre_exemplaires: 2 }
+]
+```
+</details>
+
+---
+
+#### Exercice 44 : Compter les exemplaires disponibles vs empruntés
+**Objectif :** Pour chaque livre, afficher combien d'exemplaires sont disponibles et combien sont empruntés
+
+**Ce que vous devez pratiquer :** `$filter` pour filtrer un tableau dans une projection
+
+<details>
+<summary>💡 Solution</summary>
+
+```javascript
 db.livres.aggregate([
     {$project: {
         titre: 1,
@@ -2495,7 +2595,17 @@ db.livres.aggregate([
             $size: {
                 $filter: {
                     input: "$exemplaires",
-                    cond: {$eq: ["$$this.disponible", true]}
+                    as: "ex",
+                    cond: {$eq: ["$$ex.disponible", true]}
+                }
+            }
+        },
+        empruntes: {
+            $size: {
+                $filter: {
+                    input: "$exemplaires",
+                    as: "ex",
+                    cond: {$eq: ["$$ex.disponible", false]}
                 }
             }
         }
@@ -2503,44 +2613,223 @@ db.livres.aggregate([
 ])
 ```
 
-#### 💡 Points clés à retenir sur ces requêtes
+**Explications :**
+- `$filter` : filtre les éléments d'un tableau selon une condition
+  - `input` : le tableau à filtrer (`$exemplaires`)
+  - `as` : nom de variable pour chaque élément (ici `ex`)
+  - `cond` : condition (ici : `disponible == true`)
+- `$$ex.disponible` : `$$` = référence à la variable définie dans `as`
+- On applique `$size` sur le résultat filtré pour compter
 
-**Notation pointée pour les documents imbriqués :**
+**Résultat attendu :**
 ```javascript
-// Pour accéder à un champ dans un tableau ou objet imbriqué, utiliser la notation pointée
-"exemplaires.disponible"          // Champ dans un tableau d'objets
-"auteur.nom"                       // Champ dans un objet imbriqué
-"contact.email"                    // Idem
+[
+  {
+    titre: "Le Petit Prince",
+    total_exemplaires: 3,
+    disponibles: 2,
+    empruntes: 1
+  },
+  ...
+]
+```
+</details>
+
+---
+
+#### Exercice 45 : Trouver les auteurs les plus prolifiques
+**Objectif :** Compter combien de livres chaque auteur a dans la médiathèque
+
+**Ce que vous devez pratiquer :** Grouper sur un objet imbriqué
+
+<details>
+<summary>💡 Solution</summary>
+
+```javascript
+db.livres.aggregate([
+    {$group: {
+        _id: {
+            nom: "$auteur.nom",
+            prenom: "$auteur.prenom"
+        },
+        nombre_livres: {$sum: 1},
+        livres: {$push: "$titre"}  // Bonus : lister les titres
+    }},
+    {$sort: {nombre_livres: -1}}
+])
 ```
 
-**Opérateur $ pour les tableaux :**
-```javascript
-// $ dans la projection retourne SEULEMENT le premier élément qui match
-{titre: 1, "exemplaires.$": 1}
+**Explications :**
+- `_id` peut être un objet avec plusieurs champs : regroupe par nom ET prénom
+- `$push: "$titre"` : crée un tableau avec tous les titres de l'auteur
+- Utile pour savoir quel auteur a le plus de livres dans la collection
 
-// Pour obtenir tous les éléments, ne pas utiliser $
-{titre: 1, exemplaires: 1}
+**Résultat attendu :**
+```javascript
+[
+  {
+    _id: {nom: "Rowling", prenom: "J.K."},
+    nombre_livres: 1,
+    livres: ["Harry Potter à l'école des sorciers"]
+  },
+  ...
+]
+```
+</details>
+
+---
+
+#### Exercice 46 : Statistiques globales avec $facet
+**Objectif :** Créer un tableau de bord avec plusieurs statistiques en une seule requête
+
+**Ce que vous devez pratiquer :** `$facet` pour exécuter plusieurs pipelines en parallèle
+
+<details>
+<summary>💡 Solution</summary>
+
+```javascript
+db.livres.aggregate([
+    {$facet: {
+        // Pipeline 1 : Nombre total de livres
+        total_livres: [
+            {$count: "count"}
+        ],
+
+        // Pipeline 2 : Nombre total d'exemplaires
+        total_exemplaires: [
+            {$unwind: "$exemplaires"},
+            {$count: "count"}
+        ],
+
+        // Pipeline 3 : Top 3 des catégories
+        categories_populaires: [
+            {$unwind: "$categories"},
+            {$group: {
+                _id: "$categories",
+                count: {$sum: 1}
+            }},
+            {$sort: {count: -1}},
+            {$limit: 3}
+        ],
+
+        // Pipeline 4 : Livre le plus populaire
+        livre_populaire: [
+            {$sort: {nombre_emprunts_total: -1}},
+            {$limit: 1},
+            {$project: {titre: 1, nombre_emprunts_total: 1, _id: 0}}
+        ]
+    }}
+])
 ```
 
-**⚠️ Erreur courante : Oublier les guillemets**
-```javascript
-// ❌ FAUX - provoque une erreur de syntaxe
-db.livres.find({exemplaires.disponible: true})
+**Explications :**
+- `$facet` : permet d'exécuter **plusieurs pipelines indépendants** sur les mêmes données
+- Chaque clé de `$facet` devient un champ dans le résultat
+- Très efficace pour créer des tableaux de bord complexes
+- Une seule requête au lieu de 4 !
 
-// ✅ CORRECT - guillemets obligatoires pour la notation pointée
-db.livres.find({"exemplaires.disponible": true})
+**Résultat attendu :**
+```javascript
+[{
+  total_livres: [{count: 3}],
+  total_exemplaires: [{count: 9}],
+  categories_populaires: [
+    {_id: "Jeunesse", count: 2},
+    {_id: "Fantasy", count: 1},
+    ...
+  ],
+  livre_populaire: [{titre: "Harry Potter à l'école des sorciers", nombre_emprunts_total: 234}]
+}]
+```
+</details>
+
+---
+
+#### 🎯 Exercice bonus : Taux d'occupation de la médiathèque
+**Objectif :** Calculer quel pourcentage des exemplaires est actuellement emprunté
+
+**Ce que vous devez pratiquer :** Combiner plusieurs techniques d'agrégation
+
+<details>
+<summary>💡 Solution</summary>
+
+```javascript
+db.livres.aggregate([
+    {$unwind: "$exemplaires"},
+    {$group: {
+        _id: null,  // Grouper TOUT ensemble (pas de séparation)
+        total: {$sum: 1},
+        empruntes: {
+            $sum: {
+                $cond: [{$eq: ["$exemplaires.disponible", false]}, 1, 0]
+            }
+        }
+    }},
+    {$project: {
+        _id: 0,
+        total_exemplaires: "$total",
+        exemplaires_empruntes: "$empruntes",
+        taux_occupation: {
+            $multiply: [
+                {$divide: ["$empruntes", "$total"]},
+                100
+            ]
+        }
+    }}
+])
 ```
 
-#### ✅ Point de validation #2
+**Explications :**
+- `_id: null` : groupe TOUS les documents ensemble (pas de subdivision)
+- `$cond` : if/else → si `disponible == false`, compte 1, sinon 0
+- `$divide` et `$multiply` : calculs mathématiques (pourcentage)
+- `$project` à la fin : renommer et calculer le taux final
 
-Avant de passer aux opérations transactionnelles, vérifiez que vous savez :
-- [ ] Créer des requêtes avec notation pointée sur objets imbriqués
-- [ ] Utiliser les opérateurs de comparaison ($lt, $gt, $gte, $lte)
-- [ ] Faire des projections pour sélectionner les champs
-- [ ] Trier et limiter les résultats
-- [ ] Requêter dans des tableaux avec $in
+**Résultat attendu :**
+```javascript
+[{
+  total_exemplaires: 9,
+  exemplaires_empruntes: 3,
+  taux_occupation: 33.33
+}]
+```
+</details>
 
-**📝 Mini-exercice :** Écrivez une requête qui trouve tous les livres de la catégorie "Fantasy" publiés après 1990, triés par note décroissante, en affichant seulement le titre et la note.
+---
+
+#### ✅ Auto-évaluation
+
+Avant de terminer la Phase 4, vérifiez que vous comprenez :
+- [ ] Le concept de pipeline d'agrégation (étapes successives)
+- [ ] `$unwind` pour dérouler un tableau
+- [ ] `$group` pour regrouper et compter (`$sum`, `$avg`, `$push`)
+- [ ] `$project` avec `$size` pour compter les éléments d'un tableau
+- [ ] `$filter` pour filtrer un tableau dans une projection
+- [ ] `$facet` pour exécuter plusieurs pipelines en parallèle
+- [ ] `$cond` pour les conditions if/else
+- [ ] Les calculs mathématiques (`$divide`, `$multiply`)
+
+#### 💡 Opérateurs d'agrégation utiles (résumé)
+
+| Étape | Description | Équivalent SQL |
+|-------|-------------|----------------|
+| `$match` | Filtrer les documents | `WHERE` |
+| `$project` | Sélectionner/calculer des champs | `SELECT` |
+| `$group` | Regrouper et agréger | `GROUP BY` |
+| `$sort` | Trier | `ORDER BY` |
+| `$limit` | Limiter le nombre de résultats | `LIMIT` |
+| `$unwind` | Dérouler un tableau | (pas d'équivalent direct) |
+| `$lookup` | Jointure entre collections | `JOIN` (voir séance 2) |
+| `$facet` | Plusieurs pipelines parallèles | (plusieurs requêtes) |
+
+**Accumulateurs dans $group :**
+- `$sum` : somme / comptage
+- `$avg` : moyenne
+- `$min` / `$max` : minimum / maximum
+- `$push` : créer un tableau avec toutes les valeurs
+- `$first` / `$last` : première / dernière valeur
+
+---
 
 <details>
 <summary>💡 Solution</summary>
