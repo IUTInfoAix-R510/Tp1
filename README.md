@@ -1571,7 +1571,57 @@ db.livres.insertMany([
         nombre_emprunts_total: 234
     }
 ])
+```
 
+#### 💡 Analyse de la structure des livres
+
+Prenons le temps d'analyser ce que nous venons d'insérer :
+
+**1. Objets imbriqués (nested objects)**
+```javascript
+auteur: {
+    nom: "Saint-Exupéry",
+    prenom: "Antoine de",
+    nationalite: "Française"
+}
+// ✅ Un seul auteur par livre → objet simple
+```
+
+**2. Tableaux d'objets (arrays of objects)**
+```javascript
+exemplaires: [
+    {code: "LPP-001", etat: "Bon", disponible: true},
+    {code: "LPP-002", etat: "Usé", disponible: false},
+    {code: "LPP-003", etat: "Neuf", disponible: true}
+]
+// ✅ Plusieurs exemplaires par livre → tableau
+```
+
+**3. Imbrication à 3 niveaux**
+```javascript
+exemplaires: [
+    {
+        code: "LPP-002",
+        emprunt_actuel: {           // ← Niveau 3 !
+            membre_id: "M001",
+            date_emprunt: new Date("2024-01-10")
+        }
+    }
+]
+// ✅ Un emprunt est imbriqué dans un exemplaire, lui-même dans un livre
+```
+
+**4. Schéma flexible**
+```javascript
+// Certains exemplaires ont "emplacement", d'autres "emprunt_actuel"
+{disponible: true, emplacement: "Rayon A3"}           // Disponible
+{disponible: false, emprunt_actuel: {...}}            // Emprunté
+// ✅ Pas de schéma fixe : on ajoute les champs selon le contexte
+```
+
+#### 👥 Insertion des membres
+
+```javascript
 // Collection membres
 db.membres.insertMany([
     {
