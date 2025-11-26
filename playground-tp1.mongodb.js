@@ -39,62 +39,42 @@ use('tp_mongodb_prenom_nom');  // Exemple: use('tp_mongodb_alice_martin')
 // ─────────────────────────────────────────────────────────────────────────
 
 // ────────────── Exercice 1 ──────────────
-// Objectif : Trouver tous les employés du service "Marketing"
-
 // Votre réponse :
 
 
 // ────────────── Exercice 2 ──────────────
-// Objectif : Trouver l'employé avec exactement 32 ans
-
 // Votre réponse :
 
 
 // ────────────── Exercice 3 ──────────────
-// Objectif : Trouver tous les employés de plus de 30 ans
-
 // Votre réponse :
 
 
 // ────────────── Exercice 4 ──────────────
-// Objectif : Trouver les employés qui gagnent moins de 3000€
-
 // Votre réponse :
 
 
 // ────────────── Exercice 5 ──────────────
-// Objectif : Trouver les employés entre 25 et 32 ans (inclus)
-
 // Votre réponse :
 
 
 // ────────────── Exercice 6 ──────────────
-// Objectif : Trouver les employés de IT ou RH
-
 // Votre réponse :
 
 
 // ────────────── Exercice 7 ──────────────
-// Objectif : Trouver les employés de IT qui gagnent plus de 3500€
-
 // Votre réponse :
 
 
 // ────────────── Exercice 8 ──────────────
-// Objectif : Trouver les employés de plus de 30 ans OU qui gagnent plus de 4000€
-
 // Votre réponse :
 
 
 // ────────────── Exercice 9 ──────────────
-// Objectif : Trouver les employés qui ne sont PAS dans le service "IT"
-
 // Votre réponse :
 
 
 // ────────────── Exercice 10 ──────────────
-// Objectif : Trouver les employés dont le nom commence par "D"
-
 // Votre réponse :
 
 
@@ -104,50 +84,34 @@ use('tp_mongodb_prenom_nom');  // Exemple: use('tp_mongodb_alice_martin')
 // ─────────────────────────────────────────────────────────────────────────
 
 // ────────────── Exercice 11 ──────────────
-// Objectif : Ajouter l'email "alice.martin@company.com" à l'employée Alice Martin
-
 // Votre réponse :
 
 
 // ────────────── Exercice 12 ──────────────
-// Objectif : Augmenter le salaire de Bob Dubois de 500€
-
 // Votre réponse :
 
 
 // ────────────── Exercice 13 ──────────────
-// Objectif : Changer le service de Charlie Lambert de "RH" à "IT"
-
 // Votre réponse :
 
 
 // ────────────── Exercice 14 ──────────────
-// Objectif : Ajouter la compétence "MongoDB" à Alice Martin
-
 // Votre réponse :
 
 
 // ────────────── Exercice 15 ──────────────
-// Objectif : Augmenter tous les salaires de 10%
-
 // Votre réponse :
 
 
 // ────────────── Exercice 16 ──────────────
-// Objectif : Ajouter le champ "actif: true" à tous les employés
-
 // Votre réponse :
 
 
 // ────────────── Exercice 17 ──────────────
-// Objectif : Ajouter "JavaScript" aux compétences de tous les employés IT
-
 // Votre réponse :
 
 
 // ────────────── Exercice 18 ──────────────
-// Objectif : Retirer la compétence "Excel" de Bob Dubois
-
 // Votre réponse :
 
 
@@ -157,32 +121,22 @@ use('tp_mongodb_prenom_nom');  // Exemple: use('tp_mongodb_alice_martin')
 // ─────────────────────────────────────────────────────────────────────────
 
 // ────────────── Exercice 19 ──────────────
-// Objectif : Supprimer l'employé avec le nom "Lambert"
-
 // Votre réponse :
 
 
 // ────────────── Exercice 20 ──────────────
-// Objectif : Supprimer tous les employés de plus de 33 ans
-
 // Votre réponse :
 
 
 // ────────────── Exercice 21 ──────────────
-// Objectif : Supprimer tous les employés du service "RH"
-
 // Votre réponse :
 
 
 // ────────────── Exercice 22 ──────────────
-// Objectif : Supprimer les employés qui n'ont pas de compétences
-
 // Votre réponse :
 
 
 // ────────────── Exercice 23 ──────────────
-// Objectif : Supprimer complètement la collection employes pour repartir de zéro
-
 // Votre réponse :
 
 
@@ -205,68 +159,46 @@ use('tp_mongodb_prenom_nom');  // Exemple: use('tp_mongodb_alice_martin')
 // ─────────────────────────────────────────────────────────────────────────
 
 // ────────────── Exercice 24 ──────────────
-// Objectif : Trouver les livres publiés par l'éditeur "Gallimard"
-
 // Votre réponse :
 
 
 // ────────────── Exercice 25 ──────────────
-// Objectif : Trouver les livres de l'auteur "Victor Hugo"
-
 // Votre réponse :
 
 
 // ────────────── Exercice 26 ──────────────
-// Objectif : Trouver les livres publiés après 1850
-
 // Votre réponse :
 
 
 // ────────────── Exercice 27 ──────────────
-// Objectif : Trouver les livres qui ont au moins un exemplaire disponible
-
 // Votre réponse :
 
 
 // ────────────── Exercice 28 ──────────────
-// Objectif : Trouver les livres où l'exemplaire "EX-001" existe
-
 // Votre réponse :
 
 
 // ────────────── Exercice 29 ──────────────
-// Objectif : Trouver les livres avec exactement 2 exemplaires
-
 // Votre réponse :
 
 
 // ────────────── Exercice 30 ──────────────
-// Objectif : Trouver les livres qui ont l'exemplaire "EX-001" et qui est disponible
-
 // Votre réponse :
 
 
 // ────────────── Exercice 31 ──────────────
-// Objectif : Trouver les membres qui habitent à Aix-en-Provence
-
 // Votre réponse :
 
 
 // ────────────── Exercice 32 ──────────────
-// Objectif : Trouver les membres dont le code postal commence par "13"
-
 // Votre réponse :
 
 
 // ────────────── Exercice 33 ──────────────
-// Objectif : Trouver les membres qui ont "Fantasy" dans leurs préférences
-
 // Votre réponse :
 
 
 // ────────────── Exercice 34 ──────────────
-// Objectif : Trouver les membres qui ont au moins 2 préférences
-
 // Votre réponse :
 
 
@@ -276,56 +208,38 @@ use('tp_mongodb_prenom_nom');  // Exemple: use('tp_mongodb_alice_martin')
 // ─────────────────────────────────────────────────────────────────────────
 
 // ────────────── Exercice 35 ──────────────
-// Objectif : Marquer l'exemplaire "EX-001" du livre "Les Misérables" comme emprunté
-
 // Votre réponse :
 
 
 // ────────────── Exercice 36 ──────────────
-// Objectif : Ajouter un nouvel exemplaire au livre "1984"
-
 // Votre réponse :
 
 
 // ────────────── Exercice 37 ──────────────
-// Objectif : Retirer l'exemplaire "EX-003" de "Les Misérables"
-
 // Votre réponse :
 
 
 // ────────────── Exercice 38 ──────────────
-// Objectif : Marquer tous les exemplaires du livre "1984" comme disponibles
-
 // Votre réponse :
 
 
 // ────────────── Exercice 39 ──────────────
-// Objectif : Ajouter "Science-Fiction" aux préférences de Sophie Durand
-
 // Votre réponse :
 
 
 // ────────────── Exercice 40 ──────────────
-// Objectif : Retirer "Policier" des préférences de Lucas Bernard
-
 // Votre réponse :
 
 
 // ────────────── Exercice 41 ──────────────
-// Objectif : Changer la ville de Sophie Durand à "Marseille"
-
 // Votre réponse :
 
 
 // ────────────── Exercice 42 ──────────────
-// Objectif : Enregistrer un emprunt pour Lucas Bernard
-
 // Votre réponse :
 
 
 // ────────────── Exercice 43 ──────────────
-// Objectif : Enregistrer le retour du livre par Lucas Bernard
-
 // Votre réponse :
 
 
@@ -335,38 +249,26 @@ use('tp_mongodb_prenom_nom');  // Exemple: use('tp_mongodb_alice_martin')
 // ─────────────────────────────────────────────────────────────────────────
 
 // ────────────── Exercice 44 ──────────────
-// Objectif : Compter le nombre total de livres par éditeur
-
 // Votre réponse :
 
 
 // ────────────── Exercice 45 ──────────────
-// Objectif : Calculer le nombre moyen d'exemplaires par livre
-
 // Votre réponse :
 
 
 // ────────────── Exercice 46 ──────────────
-// Objectif : Trouver les livres publiés après 1900 et compter leurs exemplaires totaux
-
 // Votre réponse :
 
 
 // ────────────── Exercice 47 ──────────────
-// Objectif : Lister les villes des membres avec le nombre de membres par ville
-
 // Votre réponse :
 
 
 // ────────────── Exercice 48 ──────────────
-// Objectif : Trouver le nombre total d'emprunts en cours
-
 // Votre réponse :
 
 
 // ────────────── Exercice 49 ──────────────
-// Objectif : Créer un rapport complet des emprunts avec toutes les informations
-
 // Votre réponse :
 
 
