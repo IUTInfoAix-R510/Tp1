@@ -39,26 +39,6 @@ La première chose que vous allez faire est de créer un fork personnel du prés
 
 GitHub va vous créer un dépôt contenant un fork du dépôt 'IUTInfoAix-R510/Tp1' et s'appelant 'IUTInfoAix-R510-2025/tp1-votreUsername'. Vous apparaîtrez automatiquement comme contributeur de ce projet pour y pousser votre travail.
 
-## Ouverture de GitHub Codespace
-
-Une fois votre fork créé, vous pouvez ouvrir le projet directement dans GitHub Codespace :
-
-1. Rendez-vous sur votre dépôt GitHub (`IUTInfoAix-R510-2025/tp1-votreUsername`)
-2. Cliquez sur le bouton vert **Code**
-3. Sélectionnez l'onglet **Codespaces**
-4. Cliquez sur **Create codespace on main**
-
-GitHub va créer un environnement de développement complet dans le cloud. Après quelques instants, vous aurez accès à VS Code directement dans votre navigateur avec :
-- Node.js et toutes les dépendances déjà installées
-- L'extension MongoDB fonctionnelle
-- Accès à mongosh
-
-Pour ouvrir le playgroung de ce TP :
-- Dans l'explorateur de fichiers (à gauche), cliquez sur le fichier `playground-tp1.mongodb.js`
-- Le notebook s'ouvrira et vous pourrez exécuter vos requêtes
-
-**Note** : GitHub offre 60 heures gratuites de Codespace par mois pour les comptes personnels.
-
 ---
 
 ## 📝 Rendu du travail
@@ -76,7 +56,7 @@ Pour faciliter le rendu de votre travail, un fichier `playground-tp1.mongodb.js`
 
 2. **Pendant le TP**
    - Naviguez vers la section correspondant à l'exercice en cours
-   - Chaque exercice a son emplacement dédié avec l'objectif rappelé
+   - Chaque exercice a son emplacement dédié
    - Écrivez votre code sous le commentaire `// Votre réponse :`
    - Testez vos requêtes directement dans VS Code avec l'extension MongoDB
 
@@ -588,7 +568,7 @@ Atlas affiche ensuite :
 
 ### 2.3 Installation des outils (20 min)
 
-Pour interagir avec MongoDB, nous allons installer 3 outils complémentaires :
+Pour interagir avec MongoDB, vous pouvez installer 3 outils complémentaires :
 
 | Outil | Type | Usage | Quand l'utiliser |
 |-------|------|-------|------------------|
@@ -596,11 +576,88 @@ Pour interagir avec MongoDB, nous allons installer 3 outils complémentaires :
 | **mongosh** | Ligne de commande (CLI) | Exécuter des requêtes MongoDB | Scripts, automatisation, TP |
 | **VS Code Extension** | Intégré à l'éditeur | Coder et tester rapidement | Développement d'applications |
 
-💡 **Conseil :** Installez les 3 ! Vous utiliserez Compass au début, puis de plus en plus mongosh.
+💡 **Conseil :** Testez les 3 ! Vous utiliserez VS Code avec l'extension MongoDB car c'est celui qui fonctionne partout.
 
 ---
 
-#### 📝 Étape 3.1 : Installer MongoDB Compass
+#### 📝 Étape 1 : Installer l'extension VS Code (recommandé)
+
+**Pourquoi cette extension ?**
+- ✅ Exécuter des requêtes MongoDB directement depuis VS Code
+- ✅ Autocomplétion intelligente
+- ✅ Visualiser les résultats dans l'éditeur
+- ✅ Créer des playgrounds (fichiers .mongodb)
+
+**Installation :**
+
+1. **Ouvrir VS Code**
+
+2. **Aller dans les Extensions**
+   - Raccourci : `Ctrl+Shift+X` (Windows/Linux) ou `Cmd+Shift+X` (Mac)
+   - Ou cliquer sur l'icône Extensions dans la barre latérale
+
+3. **Rechercher "MongoDB"**
+   ```
+   Rechercher : MongoDB
+
+   Résultat :
+   ┌─────────────────────────────────────────┐
+   │ MongoDB for VS Code                     │
+   │ by MongoDB                              │
+   │ 5M+ downloads                           │
+   │ [Install]                               │
+   └─────────────────────────────────────────┘
+   ```
+
+4. **Installer l'extension officielle**
+   - Chercher celle publiée par "MongoDB" (pas les autres !)
+   - Cliquer sur "Install"
+
+5. **Se connecter à Atlas**
+
+   a) Ouvrir la palette de commandes :
+   - `Ctrl+Shift+P` (Windows/Linux) ou `Cmd+Shift+P` (Mac)
+
+   b) Taper : `MongoDB: Connect`
+
+   c) Choisir "Connect with Connection String"
+
+   d) Coller votre connection string :
+   ```
+   mongodb+srv://etudiant:VotreMotDePasse@but3-votrenom.xxxxx.mongodb.net/
+   ```
+
+6. **Vérification**
+
+   Dans la barre latérale gauche, vous voyez maintenant une icône MongoDB (feuille verte).
+   Cliquer dessus affiche vos connexions :
+   ```
+   CONNECTIONS
+   └─ 📁 but3-votrenom
+       ├─ admin
+       ├─ config
+       └─ local
+   ```
+
+7. **Créer un playground (optionnel)**
+
+   ```
+   1. Command Palette → "MongoDB: Create MongoDB Playground"
+   2. Un fichier playground-1.mongodb s'ouvre
+   3. Essayer cette commande :
+
+   use('test')
+   db.getCollectionNames()
+
+   4. Cliquer sur le bouton ▶ "Run" en haut
+   5. Les résultats s'affichent en dessous
+   ```
+
+✅ **Checkpoint :** L'extension MongoDB affiche votre cluster dans la barre latérale
+
+---
+
+#### 📝 Étape 2 : Installer MongoDB Compass (Optionnel)
 
 **MongoDB Compass** est l'interface graphique officielle de MongoDB. C'est comme phpMyAdmin pour MySQL mais en beaucoup plus moderne !
 
@@ -679,7 +736,7 @@ c) **Vérification :**
 
 ---
 
-#### 📝 Étape 3.2 : Installer mongosh (MongoDB Shell)
+#### 📝 3 : Installer mongosh (Optionnel)
 
 **mongosh** est le shell en ligne de commande pour MongoDB. C'est l'outil principal pour les TP !
 
@@ -735,9 +792,8 @@ mongosh --version
 
 ✅ **Checkpoint :** La commande `mongosh --version` affiche un numéro de version
 
----
 
-#### 📝 Étape 3.3 : Première connexion avec mongosh
+#### 📝 Première connexion avec mongosh
 
 **1. Récupérer votre connection string**
 
@@ -800,83 +856,6 @@ exit
 ```
 
 ✅ **Checkpoint :** Vous pouvez exécuter `show dbs` et voir les 3 bases système
-
----
-
-#### 📝 Étape 3.4 : Installer l'extension VS Code (optionnel mais recommandé)
-
-**Pourquoi cette extension ?**
-- ✅ Exécuter des requêtes MongoDB directement depuis VS Code
-- ✅ Autocomplétion intelligente
-- ✅ Visualiser les résultats dans l'éditeur
-- ✅ Créer des playgrounds (fichiers .mongodb)
-
-**Installation :**
-
-1. **Ouvrir VS Code**
-
-2. **Aller dans les Extensions**
-   - Raccourci : `Ctrl+Shift+X` (Windows/Linux) ou `Cmd+Shift+X` (Mac)
-   - Ou cliquer sur l'icône Extensions dans la barre latérale
-
-3. **Rechercher "MongoDB"**
-   ```
-   Rechercher : MongoDB
-
-   Résultat :
-   ┌─────────────────────────────────────────┐
-   │ MongoDB for VS Code                     │
-   │ by MongoDB                              │
-   │ 5M+ downloads                           │
-   │ [Install]                               │
-   └─────────────────────────────────────────┘
-   ```
-
-4. **Installer l'extension officielle**
-   - Chercher celle publiée par "MongoDB" (pas les autres !)
-   - Cliquer sur "Install"
-
-5. **Se connecter à Atlas**
-
-   a) Ouvrir la palette de commandes :
-   - `Ctrl+Shift+P` (Windows/Linux) ou `Cmd+Shift+P` (Mac)
-
-   b) Taper : `MongoDB: Connect`
-
-   c) Choisir "Connect with Connection String"
-
-   d) Coller votre connection string :
-   ```
-   mongodb+srv://etudiant:VotreMotDePasse@but3-votrenom.xxxxx.mongodb.net/
-   ```
-
-6. **Vérification**
-
-   Dans la barre latérale gauche, vous voyez maintenant une icône MongoDB (feuille verte).
-   Cliquer dessus affiche vos connexions :
-   ```
-   CONNECTIONS
-   └─ 📁 but3-votrenom
-       ├─ admin
-       ├─ config
-       └─ local
-   ```
-
-7. **Créer un playground (optionnel)**
-
-   ```
-   1. Command Palette → "MongoDB: Create MongoDB Playground"
-   2. Un fichier playground-1.mongodb s'ouvre
-   3. Essayer cette commande :
-
-   use('test')
-   db.getCollectionNames()
-
-   4. Cliquer sur le bouton ▶ "Run" en haut
-   5. Les résultats s'affichent en dessous
-   ```
-
-✅ **Checkpoint :** L'extension MongoDB affiche votre cluster dans la barre latérale
 
 ---
 
