@@ -79,23 +79,9 @@ Pour faciliter le rendu de votre travail, un fichier `playground-tp1.mongodb.js`
 
 ---
 
-## ⏰ Planning de la séance
+## 📚 Phase 1 : Cours théorique - Du relationnel au NoSQL
 
-| Horaire | Durée | Activité |
-|---------|-------|----------|
-| 0h00-0h30 | 30 min | Cours : Du relationnel au NoSQL |
-| 0h30-1h15 | 45 min | Installation et configuration Atlas |
-| 1h15-1h25 | 10 min | **Pause** |
-| 1h25-2h10 | 45 min | Découverte pratique + Exercices interrogation |
-| 2h10-3h10 | 60 min | CRUD complet guidé |
-| 3h10-3h20 | 10 min | **Pause** |
-| 3h20-4h00 | 40 min | Mini-projet et validation |
-
----
-
-## 📚 Phase 1 : Cours théorique - Du relationnel au NoSQL (30 min)
-
-### 1.1 Les limites du modèle relationnel
+### Les limites du modèle relationnel
 
 #### 💡 Parallèle SQL → MongoDB : Vocabulaire
 Pour vous repérer, voici la correspondance avec vos connaissances SQL :
@@ -203,7 +189,7 @@ db.tweets.findOne({_id: ObjectId("...")})
 Une simple consultation implique jusqu'à 8 JOINs sur des tables gigantesques !
 
 
-### 1.2 Le théorème CAP et ses implications 
+### Le théorème CAP et ses implications 
 
 #### Présentation du théorème
 ```
@@ -233,7 +219,7 @@ Une simple consultation implique jusqu'à 8 JOINs sur des tables gigantesques !
 - **CP** : MongoDB, HBase (cohérence > disponibilité)
 - **AP** : Cassandra, DynamoDB (disponibilité > cohérence)
 
-### 1.3 L'écosystème NoSQL
+### L'écosystème NoSQL
 
 #### Les 4 grandes familles
 
@@ -276,7 +262,7 @@ RowKey: user1001
 - ✅ Relations complexes
 - ❌ Cas d'usage spécifiques
 
-### 1.4 Focus MongoDB
+### Focus MongoDB
 
 #### Historique et adoption
 - **2007** : Création par 10gen
@@ -317,7 +303,7 @@ Sharded Cluster (Horizontal scaling)
 
 ---
 
-## 💻 Phase 2 : Installation et configuration (45 min)
+## 💻 Phase 2 : Installation et configuration
 
 **Objectif :** Créer un environnement MongoDB professionnel et gratuit dans le cloud. À la fin de cette phase, vous aurez :
 - Un cluster MongoDB hébergé gratuitement (512 Mo)
@@ -326,7 +312,7 @@ Sharded Cluster (Horizontal scaling)
 
 ---
 
-### 2.1 Création du compte MongoDB Atlas (10 min)
+### Création du compte MongoDB Atlas
 
 #### 🤔 Qu'est-ce que MongoDB Atlas ?
 
@@ -352,7 +338,7 @@ Vos données (documents JSON)
 
 ---
 
-#### 📝 Étape 1.1 : Inscription
+#### 📝 Inscription
 
 1. **Ouvrir votre navigateur** et aller sur : https://www.mongodb.com/atlas/database
 
@@ -394,7 +380,7 @@ Vos données (documents JSON)
 
 ---
 
-### 2.2 Déploiement du cluster gratuit (15 min)
+### Déploiement du cluster gratuit
 
 #### 🤔 Qu'est-ce qu'un cluster ?
 
@@ -406,7 +392,7 @@ Si le Primary tombe en panne → un Secondary devient automatiquement Primary. V
 
 ---
 
-#### 📝 Étape 2.1 : Créer le cluster
+#### 📝 Créer le cluster
 
 1. **Cliquer sur "Build a Database"** (gros bouton vert au centre)
 
@@ -477,7 +463,7 @@ Puis :
 
 ---
 
-#### 📝 Étape 2.2 : Configuration de la sécurité
+#### 📝 Configuration de la sécurité
 
 MongoDB Atlas a 2 niveaux de sécurité obligatoires :
 1. **Authentification** : username + password
@@ -566,7 +552,7 @@ Atlas affiche ensuite :
 - **Cause :** Serveurs Atlas surchargés
 - **Solution :** Patienter jusqu'à 10 minutes. Si toujours bloqué, supprimer et recréer le cluster
 
-### 2.3 Installation des outils (20 min)
+### Installation des outils
 
 Pour interagir avec MongoDB, vous pouvez installer 3 outils complémentaires :
 
@@ -580,7 +566,7 @@ Pour interagir avec MongoDB, vous pouvez installer 3 outils complémentaires :
 
 ---
 
-#### 📝 Étape 1 : Installer l'extension VS Code (recommandé)
+#### 📝 Installer l'extension VS Code (recommandé)
 
 **Pourquoi cette extension ?**
 - ✅ Exécuter des requêtes MongoDB directement depuis VS Code
@@ -657,7 +643,7 @@ Pour interagir avec MongoDB, vous pouvez installer 3 outils complémentaires :
 
 ---
 
-#### 📝 Étape 2 : Installer MongoDB Compass (Optionnel)
+#### Installer MongoDB Compass (Optionnel)
 
 **MongoDB Compass** est l'interface graphique officielle de MongoDB. C'est comme phpMyAdmin pour MySQL mais en beaucoup plus moderne !
 
@@ -736,7 +722,7 @@ c) **Vérification :**
 
 ---
 
-#### 📝 3 : Installer mongosh (Optionnel)
+#### 📝 Installer mongosh (Optionnel)
 
 **mongosh** est le shell en ligne de commande pour MongoDB. C'est l'outil principal pour les TP !
 
@@ -861,27 +847,27 @@ exit
 
 #### ⚠️ Problèmes fréquents de connexion
 
-**Problème 5 : "Authentication failed" dans Compass**
+**Problème : "Authentication failed" dans Compass**
 - **Cause :** Mot de passe incorrect ou caractères spéciaux non échappés
 - **Solution :**
   - Vérifier que vous avez bien remplacé `<password>` par votre mot de passe réel
   - Si le mot de passe contient des caractères spéciaux (@, %, &, etc.), les encoder en URL
   - Exemple : `p@ssw0rd` devient `p%40ssw0rd`
 
-**Problème 6 : "Connection timeout" ou "Network error"**
+**Problème : "Connection timeout" ou "Network error"**
 - **Cause :** IP non autorisée ou firewall de l'IUT
 - **Solution :**
   - Vérifier dans Atlas → Network Access que 0.0.0.0/0 est bien présent
   - Si à l'IUT : demander à l'enseignant de vérifier le firewall
   - En dernier recours : utiliser un partage de connexion 4G temporaire
 
-**Problème 7 : mongosh n'est pas reconnu (Windows)**
+**Problème : mongosh n'est pas reconnu (Windows)**
 - **Cause :** Le PATH Windows n'est pas à jour
 - **Solution :**
   - Fermer et rouvrir le terminal
   - Ou utiliser le shell intégré dans Compass (en bas de l'interface)
 
-**Problème 8 : "No databases visible" après connexion**
+**Problème : "No databases visible" après connexion**
 - **Cause :** C'est NORMAL ! MongoDB est vide au départ
 - **Solution :** Passer à la Phase 3 pour créer votre première base
 
@@ -896,47 +882,7 @@ exit
 - [ ] IP 0.0.0.0/0 ajoutée dans Network Access
 
 **Outils installés**
-- [ ] MongoDB Compass installé et connecté
-- [ ] Les 3 bases système visibles dans Compass (`admin`, `config`, `local`)
-- [ ] `mongosh --version` fonctionne dans le terminal
-- [ ] `mongosh` peut se connecter à Atlas
-- [ ] Extension VS Code installée (optionnel)
-
-**Tests de connexion**
-
-Essayez ces commandes dans mongosh pour vérifier que tout fonctionne :
-
-```javascript
-// 1. Afficher la version
-db.version()
-// ✅ Doit afficher : 7.0.x
-
-// 2. Lister les bases
-show dbs
-// ✅ Doit afficher : admin, config, local
-
-// 3. Créer une base de test
-use test_connexion
-// ✅ Doit afficher : switched to db test_connexion
-
-// 4. Insérer un document test
-db.test.insertOne({message: "Ça marche !", date: new Date()})
-// ✅ Doit afficher : acknowledged: true, insertedId: ObjectId('...')
-
-// 5. Lire le document
-db.test.find()
-// ✅ Doit afficher votre document avec le message
-
-// 6. Nettoyer
-db.test.drop()
-use test_connexion
-db.dropDatabase()
-// ✅ Base de test supprimée
-```
-
-**Si tous les tests passent** → Vous êtes prêt pour la Phase 3 ! 🎉
-
-**Si un test échoue** → Relire la section troubleshooting ci-dessus ou demander de l'aide à l'enseignant.
+- [ ] Extension VS Code installée
 
 ---
 
@@ -958,14 +904,12 @@ db.dropDatabase()
 
 ---
 
-## 🔨 Phase 3 : Premières manipulations MongoDB (45 min)
+## 🔨 Phase 3 : Premières manipulations MongoDB
 
-### 3.1 Concepts fondamentaux (5 min)
+### 3.1 Concepts fondamentaux
 
 #### Hiérarchie des objets
 ```javascript
-// Dans Compass, créer via l'interface graphique :
-
 MongoDB Instance (Cluster)
     ↓
 Database: "premiere_base"         // = Schema en SQL
@@ -977,29 +921,6 @@ Document: {                       // = Row en SQL
     "nom": "Martin",              // = Column
     "age": 25                     // = Column
 }
-```
-
-#### Création dans Compass
-```
-1. Cliquer sur "CREATE DATABASE"
-2. Database Name : premiere_base
-3. Collection Name : personnes
-4. "Create Database"
-```
-
-#### Passage au shell intégré
-```javascript
-// Où sommes-nous ?
-db
-
-// Changer de base
-use premiere_base
-
-// Lister les collections
-show collections
-
-// Stats de la base
-db.stats()
 ```
 
 ### 3.2 Insertion progressive de documents (10 min)
@@ -1034,7 +955,6 @@ db.personnes.insertOne({
 
 // Observer la flexibilité du schéma
 db.personnes.find()
-// Note : .pretty() n'est plus nécessaire dans mongosh v1+, l'affichage est automatiquement formaté
 
 // 4. Types de données utiles
 db.personnes.insertOne({
@@ -1065,7 +985,7 @@ print(doc._id.getTimestamp())           // Date de création automatique !
 // ⚠️ Point important : l'_id est AUTOMATIQUEMENT généré si vous ne le fournissez pas
 ```
 
-**📝 Exercice rapide de validation :**
+**📝 Exercice rapide :**
 Avant de continuer, testez votre compréhension en insérant un nouveau document avec :
 - Votre prénom
 - Votre âge
@@ -1088,7 +1008,7 @@ db.personnes.insertOne({
 ```
 </details>
 
-### 3.3 Requêtes basiques (5 min)
+### 3.3 Requêtes basiques
 
 ```javascript
 // Base de travail plus riche
@@ -1142,7 +1062,7 @@ db.employes.find({competences: "MongoDB"})
 
 ---
 
-### 3.4 Exercices d'interrogation de données (10 min)
+### 3.4 Exercices d'interrogation de données
 
 Maintenant que vous avez vu les différentes syntaxes, testez votre compréhension avec ces exercices pratiques sur la collection `employes`.
 
@@ -1397,7 +1317,7 @@ Avant de passer à la suite, vérifiez que vous maîtrisez :
 
 ---
 
-### 3.5 Exercices de modification de données (10 min)
+### 3.5 Exercices de modification de données
 
 Maintenant que vous savez interroger les données, apprenons à les modifier ! Utilisez toujours la collection `employes` pour ces exercices.
 
@@ -1696,7 +1616,7 @@ Avant de passer à la suite, vérifiez que vous maîtrisez :
 
 ---
 
-### 3.6 Exercices de suppression de données (5 min)
+### 3.6 Exercices de suppression de données
 
 Dernière opération CRUD : la suppression ! Attention, ces opérations sont **irréversibles** en production.
 
@@ -1932,7 +1852,7 @@ Avant de passer à la suite, vérifiez que vous maîtrisez :
 - `db.dropDatabase()` supprime TOUTE la base de données
 - **Aucun retour en arrière possible !**
 
-💡 **Bonne pratique professionnelle :**
+💡 **Bonne pratique :**
 1. Toujours faire un `find()` avec les mêmes critères AVANT `delete()`
 2. Vérifier le `countDocuments()` pour savoir combien seront supprimés
 3. En production, préférer le "soft delete" (marqueur `actif: false`)
@@ -1960,7 +1880,7 @@ Essayez ces commandes pour vérifier votre compréhension :
 
 ```javascript
 // 1. Créer une collection test
-use validation_test
+use(validation_test)
 db.test_validation.drop()
 
 // 2. Insérer des documents variés
@@ -2020,13 +1940,13 @@ db.test_validation.drop()
 
 ---
 
-## 🎯 Phase 4 : CRUD complet sur cas concret (60 min)
+## 🎯 Phase 4 : CRUD complet sur cas concret
 
 Cette phase vous permet de mettre en pratique **tous les concepts vus précédemment** sur un cas réel : une médiathèque. Vous allez découvrir comment modéliser des données complexes avec des **documents imbriqués** et des **tableaux**, puis réaliser des opérations avancées.
 
 ---
 
-### 4.1 Contexte et modélisation guidée (10 min)
+### 4.1 Contexte et modélisation guidée
 
 #### 📖 Le contexte métier
 
@@ -2402,7 +2322,7 @@ Vérifiez votre compréhension avant de continuer :
 
 ---
 
-### 4.2 Exercices d'interrogation sur documents imbriqués (15 min)
+### 4.2 Exercices d'interrogation sur documents imbriqués
 
 Maintenant que vous avez des données complexes, apprenons à les interroger efficacement ! Ces exercices vous apprennent la **notation pointée**, essentielle pour travailler avec des documents imbriqués.
 
@@ -2715,7 +2635,7 @@ db.livres.find({"auteur.nom": "Orwell"})
 
 ---
 
-### 4.3 Exercices de modification sur documents complexes (20 min)
+### 4.3 Exercices de modification sur documents complexes
 
 Vous savez maintenant interroger des documents imbriqués. Apprenons à les **modifier** ! Cette section est cruciale pour comprendre comment mettre à jour des données dans des tableaux et objets imbriqués.
 
@@ -3138,7 +3058,7 @@ db.livres.updateOne(
 
 ---
 
-### 4.4 Introduction à l'agrégation avec exercices (15 min)
+### 4.4 Introduction à l'agrégation avec exercices
 
 L'**agrégation** est un outil puissant pour faire des **statistiques** et des **transformations** complexes sur vos données. C'est l'équivalent MongoDB des `GROUP BY`, `JOIN` et fonctions d'agrégation SQL.
 
@@ -3528,7 +3448,7 @@ Avant de terminer la Phase 4, vérifiez que vous comprenez :
 
 ---
 
-## 🚀 Phase 5 : Mini-projet guidé - Système de gestion complet (40 min)
+## 🚀 Phase 5 : Mini-projet guidé - Système de gestion complet (optionnel)
 
 Cette dernière phase vous permet de mettre en pratique **tout ce que vous avez appris** à travers un mini-projet réaliste : ajouter un système d'avis, de recommandations et un tableau de bord à la médiathèque.
 
@@ -4230,5 +4150,3 @@ Si vous voulez pratiquer d'ici la prochaine séance :
 **Questions ?** N'hésitez pas à créer une [issue sur GitHub](https://github.com/IUTInfoAix-R510/Cours/issues) ou à contacter votre enseignant.
 
 ---
-
-*Document généré pour le module R5.Real.10 - IUT d'Aix-Marseille - BUT Informatique 3ème année*
